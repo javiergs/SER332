@@ -1,3 +1,2 @@
 # SER332
-Introduction to Graphics
-.
+Code examples for SER431 course (Advanced Graphics)
