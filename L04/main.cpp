@@ -1,5 +1,5 @@
 /*
-Lecture 04
+Lecture 04: Callback functions
 http://javiergs.com/teaching/ser332
 */
 
