@@ -1,6 +1,6 @@
 /*
- * Hello World with OpenGL
-http://slides.com/javiergs/ser332-l03
+Lecture 03: Hello World with OpenGL
+http://javiergs.com/teaching/ser332
 */
 
 #include "glut.h"
