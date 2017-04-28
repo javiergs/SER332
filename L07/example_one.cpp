@@ -1,7 +1,7 @@
 /*
-Lecture 07
-http://slides.com/javiergs/ser431-l07
-*/
+ * Lecture 07
+ * http://javiergs.com/teaching/ser332
+ */
 
 #include "glut.h"
 
