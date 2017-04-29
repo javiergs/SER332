@@ -1,128 +1,142 @@
-/*
- * LAB 1
- * http://javiergs.com/teaching/ser332
- */
- 
 #include "glut.h"
 
-GLfloat angles = 0, scale = 1.5;
-int defaultHeight = 500;
-int defaultWidth = 500;
-float aspectRatio;
+void display();
+void resizeWindow(int newWidth, int newHeight);
 
-void reshapeWindow(int width, int height)
-{
-  glViewport(0, 0, width, height);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  aspectRatio = (float)width / (float)height;
-  if (width >= height)
-  {
-    gluOrtho2D(-defaultWidth*aspectRatio, defaultWidth*aspectRatio, -defaultHeight, defaultHeight);
-  }
-  else
-  {
-    gluOrtho2D(-defaultWidth, defaultWidth, -defaultHeight / aspectRatio, defaultHeight / aspectRatio);
-  }
-}
+int width = 500;
+int height = 500;
 
-void init()
-{
-  glClearColor(1.0, 1.0, 1.0, 0.0);
-  glColor3f(0.0, 0.0, 0.0);
-  glLoadIdentity();
-}
+float aspectRatio = 1;
+float left, bottom = -1;
+float right, top = 1;
 
-void myIdle()
-{
-  if (angles > 360.0f)
-  {
-    angles = 0.0f;
-  }
-  angles += 0.1f;
+float scaleFactor = 1;
+float angle = 0;
 
-  if (scale > 3.5f)
-  {
-    scale = 0.0f;
-  }
-  scale += 0.001f;
 
-  glutPostRedisplay();
-}
+void main(int argc, char ** argv) {
 
-void display()
-{
-  // bottom left view port
-  // square revolving around square
-  glViewport(0, 0, 250, 250);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glClear(GL_COLOR_BUFFER_BIT);
-  glShadeModel(GL_SMOOTH); // SMOOTH or FLAT
-  glBegin(GL_QUADS);
-  glColor3f(1.0, 1.0, 0.0); glVertex2f(0.25f, -0.25f);
-  glColor3f(1.0, 0.647, 0.0); glVertex2f(0.25f, 0.25f);
-  glColor3f(1.0, 0.0, 0.0); glVertex2f(-0.25f, 0.25f);
-  glColor3f(1.0, 0.647, 0.0); glVertex2f(-0.25f, -0.25f);
-  glColor3f(1.0, 0.0, 0.0); glVertex2f(0.25f, -0.25f);
-  glEnd();
-
-  glRotatef(-angles, 0.0f, 0.0f, 1.0f);
-  glTranslatef(0.65, 0.0, 0.0);
-  glRotatef(angles, 0.0f, 0.0f, 1.0f);
-
-  glBegin(GL_QUADS);
-  glColor3f(0.0f, 0.0f, 0.804f); glVertex2f(-0.05, 0.05);
-  glVertex2f(-0.05, -0.05);
-  glColor3f(0.502f, 0.0f, 0.0f); glVertex2f(0.05, -0.05);
-  glVertex2f(0.05, 0.05);
-  glEnd();
-
-  // upper right viewport
-  // scaling a square
-  glViewport(250, 250, 250, 250);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glShadeModel(GL_SMOOTH); // SMOOTH or FLAT
-  glScaled(scale, scale, scale);
-  glBegin(GL_QUADS);
-  glColor3f(0.753, 0.753, 0.753);
-  glVertex2f(0.25f, -0.25f);
-  glVertex2f(0.25f, 0.25f);
-  glVertex2f(-0.25f, 0.25f);
-  glVertex2f(-0.25f, -0.25f);
-  glVertex2f(0.25f, -0.25f);
-  glEnd();
-
-  // upper right hand viewport
-  // square spinning
-  glViewport(0, 250, 250 * .5 * aspectRatio, 250 * .5*aspectRatio);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glShadeModel(GL_SMOOTH); // SMOOTH or FLAT
-  glRotatef(angles, 0.0f, 0.0f, 1.0f);
-  glBegin(GL_QUADS);
-  glColor3f(0.000, 0.000, 1.000); glVertex2f(0.25f, -0.25f);
-  glColor3f(0.000, 1.000, 1.000); glVertex2f(0.25f, 0.25f);
-  glColor3f(0.000, 0.502, 0.000); glVertex2f(-0.25f, 0.25f);
-  glColor3f(0.000, 1.000, 1.000); glVertex2f(-0.25f, -0.25f);
-  glEnd();
-
-  glutSwapBuffers(); // forces previously issued commands to execute
-}
-
-int main(int argc, char** argv)
-{
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-  glutInitWindowSize(defaultWidth, defaultHeight);
+  glutInitWindowSize(width, height);
   glutInitWindowPosition(0, 0);
-  glutCreateWindow("In Class Lab");
-  init();
-  glutDisplayFunc(display);
+  glutCreateWindow("Lab 01");
 
-  glutIdleFunc(myIdle);
-  glutReshapeFunc(reshapeWindow);
+  // Callback functions
+  glutDisplayFunc(display);
+  glutReshapeFunc(resizeWindow);
   glutMainLoop();
-  return 0;
+
+}
+
+void resizeWindow(int newWidth, int newHeight) {
+
+  aspectRatio = (float)newWidth / (float)newHeight;
+
+  if (newWidth >= newHeight) {
+    left = -1 * aspectRatio;
+    right = aspectRatio;
+    bottom = -1;
+    top = 1;
+  }
+  else {
+    left = -1;
+    right = 1;
+    bottom = -1 / aspectRatio;
+    top = 1 / aspectRatio;
+  }
+
+  width = newWidth;
+  height = newHeight;
+
+}
+
+void display() {
+
+  glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+
+  // Viewport 1
+  glViewport(0, 0, width / 2, height / 2);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(left, right, bottom, top);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glPushMatrix();
+
+  glBegin(GL_QUADS);
+  glColor3f(1, 0, 0); glVertex2f(.25, -.25);
+  glColor3f(.5f, 0, .5f); glVertex2f(.25, .25);
+  glColor3f(0, 0, 1); glVertex2f(-.25, .25);
+  glColor3f(.5f, 0, .5f); glVertex2f(-.25, -.25);
+  glEnd();
+
+  glPopMatrix();
+
+  glPushMatrix();
+
+  glRotatef(angle, 0, 0, 1);
+  glTranslatef(.9f, 0, 0);
+  glRotatef(-angle, 0, 0, 1);
+
+  glBegin(GL_QUADS);
+  glColor3f(1, .5, 0); glVertex2f(.10, -.10);
+  glColor3f(1, 0, 0); glVertex2f(.10, .10);
+  glColor3f(1, .5, 0); glVertex2f(-.10, .10);
+  glColor3f(1, 1, 0); glVertex2f(-.10, -.10);
+  glEnd();
+  glPopMatrix();
+
+  scaleFactor += .0004;
+  angle += .01;
+
+
+  // Viewport 2
+  glViewport(width / 2, height / 2, width / 2, height / 2);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(left, right, bottom, top);
+
+  float squareSize = .25;
+
+  if (scaleFactor >= 2.5) { scaleFactor = 1; }
+
+  glPushMatrix();
+
+  glScalef(scaleFactor, scaleFactor, 0);
+
+  glBegin(GL_QUADS);
+  glColor3f(0, 1, 1);
+  glVertex2f(squareSize, -squareSize);
+  glVertex2f(squareSize, squareSize);
+  glVertex2f(-squareSize, squareSize);
+  glVertex2f(-squareSize, -squareSize);
+  glEnd();
+
+  glPopMatrix();
+
+
+  // Viewport 3
+  glViewport(0, height / 2, width / 2, height / 2);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(left, right, bottom, top);
+
+  glPushMatrix();
+
+  glRotatef(angle, 0, 0, 1);
+
+  glBegin(GL_QUADS);
+  glColor3f(1, 1, 1); glVertex2f(.4, -.4);
+  glColor3f(.8, 1, .8); glVertex2f(.4, .4);
+  glColor3f(0, 1, 0); glVertex2f(-.4, .4);
+  glColor3f(.8, 1, .8); glVertex2f(-.4, -.4);
+  glEnd();
+
+  glPopMatrix();
+
+
+  glutPostRedisplay();
+  glutSwapBuffers();
+
 }
