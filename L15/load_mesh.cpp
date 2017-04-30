@@ -9,16 +9,12 @@ http://javiergs.com/teaching/ser332
 #include<iostream>
 #include<fstream>
 #include<string>
-
 #define PI 3.1415926
-
 using namespace std;
 using namespace Imath;
-
 // mesh
 typedef Vec3<float> Vec3f;
 typedef Vec2<float> Vec2f;
-
 struct Mesh {
   // vertex
   vector<Vec3f> dot_vertex;
@@ -29,12 +25,13 @@ struct Mesh {
   vector<int> face_index_normal;
   vector<int> face_index_texture;
 };
-
 // global
 int width = 1200;
 int height = 600;
 float ratio = 1.0;
 GLuint displayList;
+//<JGS> step 1. add more GLuint variables to create more display list ids </JGS>
+//<JGS> GLuint another_displayList </JGS>
 
 // controling parameters
 int mouse_button;
@@ -43,13 +40,10 @@ int mouse_y = 0;
 float scale = 1.0;
 float x_angle = 0.0;
 float y_angle = 0.0;
-
 // global moving
 float angle = 0;
 Vec3f moving_position = Vec3f(0, 0, 0);
 Vec3f center_position = Vec3f(0, 0, 0);
-
-/* ---------------------------------------- BEGIN:MESH CODE  ---------------------------------------- */
 
 // str to int
 int StrToInt(const string &str) {
@@ -84,7 +78,7 @@ vector<string> split_string(const string& str, const string& split_str) {
 
 // load file
 Mesh* loadFile(const char* file) {
-  Mesh *m =  new Mesh;
+  Mesh *m = new Mesh;
   m->dot_vertex.clear();
   m->face_index_vertex.clear();
   ifstream infile(file);
@@ -154,7 +148,7 @@ Mesh* loadFile(const char* file) {
         memcpy(&vnt[1], &vnt[2], sizeof(int) * 3);
       }
     }
-    break;
+              break;
     default:
       break;
     }
@@ -174,7 +168,6 @@ GLuint meshToDisplayList(Mesh* m, int id) {
       glTexCoord2fv(&m->dot_texture[m->face_index_texture[i]].x);
     // color
     Vec3f offset = (m->dot_vertex[m->face_index_vertex[i]]);
-    //
     glColor3f(fabs(sin(offset.x)), fabs(cos(offset.y)), fabs(offset.z));
     glVertex3fv(&m->dot_vertex[m->face_index_vertex[i]].x);
   }
@@ -182,14 +175,19 @@ GLuint meshToDisplayList(Mesh* m, int id) {
   glEndList();
   return listID;
 }
-/* ----------------------------------------- END:MESH CODE  ----------------------------------------- */
 
 // init
 void init() {
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
   Mesh* mesh = loadFile("../obj files/f-16.obj");
-  displayList = meshToDisplayList(mesh,1);
+  // <JGS> step 2 load more files; create more Mesh variables </JGS>
+  // <JGS> Mesh* another_mesh = loadFile("../obj files/file_name.obj"); </JGS>
+
+  displayList = meshToDisplayList(mesh, 1);
+  // <JGS> step 3 create more Mesh variables <JGS>
+  // <JGS> another_displayList = meshToDisplayList(another_mesh,2); </JGS>
+
   ratio = (double)width / (double)height;
 }
 
@@ -238,7 +236,7 @@ void move() {
 // text
 void renderBitmapString(float x, float y, float z, char *string) {
   char *c;
-  glRasterPos3f(x, y, z);   // fonts position
+  glRasterPos3f(x, y, z); // fonts position
   for (c = string; *c != '\0'; c++)
     glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
 }
@@ -273,6 +271,12 @@ void display(void) {
   glEnd();
   // draw mesh
   glCallList(displayList);
+
+  // <JGS> step 4 translate, scale, and draw </JGS>
+  // <JGS> glTranslate(100.0, 0.0, 0.0); </JGS>   
+  // <JGS> glScalef(scale*1.5, scale*1.5, scale*1.5); </JGS> 
+  // <JGS> glCallList(another_displayList); </JGS>
+
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
