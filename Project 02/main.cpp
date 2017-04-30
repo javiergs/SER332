@@ -92,7 +92,7 @@ int main(int argc, char** argv)
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(windowSizeX, windowSizeY);
   glutInitWindowPosition(0, 0);
-  glutCreateWindow("James Smith Project 2");
+  glutCreateWindow("Project 2");
 
   glutDisplayFunc(myDisplayFunction);
   glutIdleFunc(update);
