@@ -37,7 +37,7 @@ void main(int argc, char ** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(0, 0);
-	glutCreateWindow("Gary Morris");
+	glutCreateWindow("Hello OpenGL");
 
 	glutDisplayFunc(display);
 	glutIdleFunc(display);
