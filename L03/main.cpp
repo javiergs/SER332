@@ -41,7 +41,7 @@ void main(int argc, char** argv) {
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
   glutInitWindowSize(500, 500); // actual window size	
   glutInitWindowPosition(0, 0); // window location
-  glutCreateWindow("simple");
+  glutCreateWindow("Lecture 03");
   myInit();
   glutDisplayFunc(myDisplay);
   glutMainLoop(); //event loop 
