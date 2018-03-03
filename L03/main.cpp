@@ -3,13 +3,17 @@ Lecture 03: Hello World with OpenGL
 http://javiergs.com/teaching/ser332
 */
 
-#include "glut.h"
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
 // myInit
 void myInit() {
   glClearColor(0.764f, 0.129f, 0.282f, 1.0); // maroon clear color
   glColor3f(1.0f, 0.843f, 0.0f);  // gold
-                                  // projection transformations
+  // projection transformations123
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluOrtho2D(-1.0, 1.0, -1.0, 1.0); // units inside
