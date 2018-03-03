@@ -1,3 +1,3 @@
-* OpenGL and Ilmbase libraries
+* OpenGL libraries
 
 * My first program with OpenGL
