@@ -2,4 +2,4 @@
 
 * My first program with OpenGL
 
-![Screenshot](screenshot.png)
+![Screenshot](ScreenShot.png)
