@@ -2,4 +2,6 @@
 
 * My first program with OpenGL
 
-![Screenshot](ScreenShot.png)
+<p align="center">
+  <img src="ScreenShot.png" width="350"/>
+</p>
