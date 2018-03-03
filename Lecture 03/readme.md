@@ -3,5 +3,5 @@
 * My first program with OpenGL
 
 <p align="center">
-  <img src="ScreenShot.png" width="350"/>
+  <img src="ScreenShot.png" width="480"/>
 </p>
