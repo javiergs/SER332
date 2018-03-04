@@ -2,4 +2,6 @@
 
 * My first program with OpenGL
 
-![Alt text](/ScreenShot.png?raw=true "Title")
+<p align="center">
+  <img src="ScreenShot.png" width="480"/>
+</p>
