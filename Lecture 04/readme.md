@@ -1,4 +1,3 @@
-* OpenGL libraries
 
 * Example with Callback functions 
 
