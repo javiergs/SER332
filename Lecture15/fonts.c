@@ -1,11 +1,13 @@
-/*
-Lecture 08
-http://slides.com/javiergs/ser431-l08
-*/
+
 
 #include <stdio.h>
 #include <math.h>
-#include "glut.h"
+
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
 float angle = 0.0;
 float x = 0.0f, y = 1.75f, z = 5.0f;
