@@ -1,4 +1,8 @@
-#include "glut.h"
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
 void display();
 void resizeWindow(int newWidth, int newHeight);
@@ -20,7 +24,7 @@ void main(int argc, char ** argv) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(width, height);
   glutInitWindowPosition(0, 0);
-  glutCreateWindow("Lab 01");
+  glutCreateWindow("Lab 02");
 
   // Callback functions
   glutDisplayFunc(display);
@@ -87,8 +91,8 @@ void display() {
   glEnd();
   glPopMatrix();
 
-  scaleFactor += .0004;
-  angle += .01;
+  scaleFactor += .004;
+  angle += .1;
 
 
   // Viewport 2
