@@ -9,6 +9,7 @@ See: http://javiergs.com/teaching/ser332
 <li>OpenGL: Introduction
 <li>OpenGL: Callback Functions
 <li>OpenGL: Vertex and Shading
+<li>OpenGL: Lab 1  
 <li>OpenGL: Transformations (ModelView)
 <li>OpenGL: Transformations (Viewport)
 <li>Lab 1
