@@ -1,17 +1,25 @@
-/*
-Lecture 15
-http://javiergs.com/teaching/ser332
-*/
+/**
+ * Lecture 17
+ * http://javiergs.com/teaching/ser332
+ */
 
 #include <vector>
-#include "imathvec.h"
-#include "glut.h"
+#include <ImathVec.h>
 #include<iostream>
 #include<fstream>
 #include<string>
+#include <unistd.h>
+
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+
 #define PI 3.1415926
 using namespace std;
 using namespace Imath;
+
 // mesh
 typedef Vec3<float> Vec3f;
 typedef Vec2<float> Vec2f;
@@ -25,11 +33,13 @@ struct Mesh {
   vector<int> face_index_normal;
   vector<int> face_index_texture;
 };
+
 // global
 int width = 1200;
 int height = 600;
-float ratio = 1.0;
+float rratio = 1.0;
 GLuint displayList;
+
 //<JGS> step 1. add more GLuint variables to create more display list ids </JGS>
 //<JGS> GLuint another_displayList </JGS>
 
@@ -45,14 +55,18 @@ float angle = 0;
 Vec3f moving_position = Vec3f(0, 0, 0);
 Vec3f center_position = Vec3f(0, 0, 0);
 
-// str to int
+/**
+ * str to int
+ */
 int StrToInt(const string &str) {
   int i;
-  if (sscanf_s(str.c_str(), "%i", &i) == 1) return i;
+  if (sscanf(str.c_str(), "%i", &i) == 1) return i;
   else return 0;
 }
 
-// split string
+/**
+ * split string
+ */
 vector<string> split_string(const string& str, const string& split_str) {
   vector<string> stlv_string;
   string part_string("");
@@ -76,14 +90,20 @@ vector<string> split_string(const string& str, const string& split_str) {
   return stlv_string;
 }
 
-// load file
+/**
+ * load file
+ */
 Mesh* loadFile(const char* file) {
   Mesh *m = new Mesh;
   m->dot_vertex.clear();
   m->face_index_vertex.clear();
+
   ifstream infile(file);
   if (infile.fail()) {
     cout << "Error opening file " << file;
+	char *cwd_buffer = (char*)malloc(sizeof(char) * 100);
+	char *cwd_result = getcwd(cwd_buffer, 100);
+	cout<<"Current directory is "<< cwd_result<<endl;
     return NULL;
   }
   char current_line[1024];
@@ -94,15 +114,15 @@ Mesh* loadFile(const char* file) {
       float x, y, z;
       switch (current_line[1]) {
       case 'n':
-        sscanf_s(current_line, "vn %f %f %f", &x, &y, &z);
+        sscanf(current_line, "vn %f %f %f", &x, &y, &z);
         m->dot_normal.push_back(Vec3f(x, y, z));
         break;
       case 't':
-        sscanf_s(current_line, "vt %f %f", &x, &y);
+        sscanf(current_line, "vt %f %f", &x, &y);
         m->dot_texture.push_back(Vec2f(x, y));
         break;
       default:
-        sscanf_s(current_line, "v %f %f %f", &x, &y, &z);
+        sscanf(current_line, "v %f %f %f", &x, &y, &z);
         m->dot_vertex.push_back(Vec3f(x, y, z));
         break;
       }
@@ -156,7 +176,9 @@ Mesh* loadFile(const char* file) {
   return m;
 }
 
-// draw
+/**
+ * meshToDisplayList
+ */
 GLuint meshToDisplayList(Mesh* m, int id) {
   GLuint listID = glGenLists(id);
   glNewList(listID, GL_COMPILE);
@@ -176,37 +198,45 @@ GLuint meshToDisplayList(Mesh* m, int id) {
   return listID;
 }
 
-// init
+/**
+ * init
+ */
 void init() {
   glShadeModel(GL_SMOOTH);
   glEnable(GL_DEPTH_TEST);
-  Mesh* mesh = loadFile("../obj files/f-16.obj");
+
+  Mesh* mesh = loadFile("./src/obj files/f-16.obj");
+  if (mesh==NULL) exit(1);
   // <JGS> step 2 load more files; create more Mesh variables </JGS>
   // <JGS> Mesh* another_mesh = loadFile("../obj files/file_name.obj"); </JGS>
-
   displayList = meshToDisplayList(mesh, 1);
   // <JGS> step 3 create more Mesh variables <JGS>
   // <JGS> another_displayList = meshToDisplayList(another_mesh,2); </JGS>
-
-  ratio = (double)width / (double)height;
+  rratio = (double)width / (double)height;
 }
 
-// reshape
+/**
+ * reshape
+ */
 void reshape(int w, int h) {
   width = w;
   height = h;
   if (h == 0) h = 1;
-  ratio = 1.0f * w / h;
+  rratio = 1.0f * w / h;
 }
 
-// mouse
+/**
+ * mouse
+ */
 void mouse(int button, int state, int x, int y) {
   mouse_x = x;
   mouse_y = y;
   mouse_button = button;
 }
 
-// motion
+/**
+ * motion
+ */
 void motion(int x, int y) {
   if (mouse_button == GLUT_LEFT_BUTTON) {
     y_angle += (float(x - mouse_x) / width) *360.0;
@@ -223,7 +253,9 @@ void motion(int x, int y) {
 }
 
 
-// moving
+/**
+ * move
+ */
 void move() {
   // rotate diamond
   angle = angle + 0.1;
@@ -233,7 +265,9 @@ void move() {
   glutPostRedisplay();
 }
 
-// text
+/**
+ * renderBitmapString
+ */
 void renderBitmapString(float x, float y, float z, char *string) {
   char *c;
   glRasterPos3f(x, y, z); // fonts position
@@ -241,7 +275,9 @@ void renderBitmapString(float x, float y, float z, char *string) {
     glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *c);
 }
 
-// display
+/**
+ * display
+ */
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // projection
@@ -249,7 +285,7 @@ void display(void) {
   glPushMatrix();
   glLoadIdentity();
   glViewport(0, 0, width, height);
-  gluPerspective(45, ratio, 1, 1000);
+  gluPerspective(45, rratio, 1, 1000);
   // view
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
@@ -273,8 +309,8 @@ void display(void) {
   glCallList(displayList);
 
   // <JGS> step 4 translate, scale, and draw </JGS>
-  // <JGS> glTranslate(100.0, 0.0, 0.0); </JGS>   
-  // <JGS> glScalef(scale*1.5, scale*1.5, scale*1.5); </JGS> 
+  // <JGS> glTranslate(100.0, 0.0, 0.0); </JGS>
+  // <JGS> glScalef(scale*1.5, scale*1.5, scale*1.5); </JGS>
   // <JGS> glCallList(another_displayList); </JGS>
 
   glMatrixMode(GL_PROJECTION);
@@ -300,8 +336,10 @@ void display(void) {
   move();
 }
 
-// main
-void main(int argc, char* argv[]) {
+/**
+ * main
+ */
+int main(int argc, char* argv[]) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
   glutInitWindowPosition(0, 0);
@@ -313,4 +351,5 @@ void main(int argc, char* argv[]) {
   glutMotionFunc(motion);
   init();
   glutMainLoop();
+  return 0;
 }
