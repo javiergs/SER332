@@ -12,7 +12,7 @@ See: http://javiergs.com/teaching/ser332
 <li>OpenGL: Lab 1  
 <li>OpenGL: Transformations (ModelView)
 <li>OpenGL: Transformations (Viewport)
-<li>Lab 1
+<li>OepnGL: Lab 2
 <li>OpenGL: Display Lists and Menus
 <li>OpenGL: Transformations (Projection)
 <li>Lab 2 (Animation)
