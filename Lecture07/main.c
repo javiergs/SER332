@@ -1,13 +1,19 @@
-/*
-Lecture 06: Transformations (ModelView)
-http://javiergs.com/teaching/ser332
-*/
+/**
+ * Lecture 07: Transformations (ModelView)
+ * http://javiergs.com/teaching/ser332
+ */
 
-#include "glut.h"
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 
 int year = 0, day = 0;
 
-// myDisplay
+/**
+ * myDisplay
+ */
 void myDisplay(void) {
   glClear(GL_COLOR_BUFFER_BIT);
   glColor3f(1.0, 1.0, 1.0);
@@ -33,7 +39,9 @@ void myDisplay(void) {
   glFlush();
 }
 
-// myInit
+/**
+ * myInit
+ */
 void myInit() {
   glClearColor(0.764f, 0.129f, 0.282f, 1.0); // maroon clear color
  // projection transformations
@@ -42,7 +50,9 @@ void myInit() {
   gluOrtho2D(-5.0, 5.0, -5.0, 5.0); // units inside
 }
 
-// myKeyboard
+/**
+ * myKeyboard
+ */
 void myKeyboard(unsigned char key, int x, int y) {
   switch (key) {
     case 'd':
@@ -66,13 +76,15 @@ void myKeyboard(unsigned char key, int x, int y) {
   }
 }
 
-// main
+/**
+ * main
+ */
 void main(int argc, char** argv) {
   glutInit(&argc, argv); // glut init
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
   glutInitWindowSize(500, 500); // actual window size	
   glutInitWindowPosition(0, 0); // window location
-  glutCreateWindow("simple");
+  glutCreateWindow("Lecture 07");
   myInit();
   glutDisplayFunc(myDisplay);
   glutKeyboardFunc(myKeyboard);
