@@ -1,6 +1,7 @@
-/*
-Lecture 08
-*/
+/**
+ * Lecture 10
+ * http://javiergs.com/teaching/ser332
+ */
 
 #include "glut.h"
 
