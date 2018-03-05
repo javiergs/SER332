@@ -21,17 +21,16 @@ See: http://javiergs.com/teaching/ser332
     
 <li>OpenGL: Fonts, OBJ files, and Midterm Review
 <li>Mesh Data Structure
-<li>Load Data in a Mesh Data Structure
-<li>Lab 3 (OBJ Files)
-<li>Lab 4 (Mesh)
+<li>Lab 5 (Load Data in a Mesh Data Structure)
+<li>Lab 6 (OBJ Files)
 <li>Light and Normals
 <li>Materials
-<li>Lab 5 (light and materials)
+<li>Lab 7 (light and materials)
 <li>Textures
-<li>Lab 6 (Textures)
+<li>Lab 8 (Textures)
 <li>Noise
-<li>Lab 7 (Navigation)
-<li>Lab 8 (Noise)
+<li>Lab 8 (Navigation)
+<li>Lab 9 (Noise)
 <li>Final Review
 </ol>
     
