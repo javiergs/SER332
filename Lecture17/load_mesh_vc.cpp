@@ -1,6 +1,9 @@
 /**
 * Lecture 17
 * http://javiergs.com/teaching/ser332
+*
+* If you are working on Visual Studio for Windows and Having problems with uninst.h., Use this.
+*
 */
 
 #include <vector>
@@ -8,17 +11,9 @@
 #include<iostream>
 #include<fstream>
 #include<string>
-
-
 #include <direct.h>  
- 
 
-
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
 #include <GL/glut.h>
-#endif
 
 #define PI 3.1415926
 using namespace std;
