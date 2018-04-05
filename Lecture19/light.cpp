@@ -6,14 +6,13 @@
 #include<string>
 
 #define PI 3.1415926
-
 using namespace std;
 using namespace Imath;
 
 // mesh
 typedef Vec3<float> Vec3f;
 typedef Vec2<float> Vec2f;
-
+// Update
 struct Mesh {
 	// vertex
 	vector<Vec3f> dot_vertex;
@@ -29,17 +28,21 @@ struct Mesh {
 
 
 // global
+Mesh* mesh1;
+Mesh* mesh2;
+Mesh* mesh3;
+Mesh* mesh4;
+
 int width = 1200;
 int height = 600;
 float ratio = 1.0;
-GLuint displayDiamond, displayPlane, displayMesh;
-int spin = 0;
+GLuint displayDiamond, displayPlane, displayMesh, displayMeshB;
 
 // controling parameters
 int mouse_button;
 int mouse_x = 0;
 int mouse_y = 0;
-float scale = 1.0;
+float scale = 0.3;
 float x_angle = 0.0;
 float y_angle = 0.0;
 
@@ -54,52 +57,18 @@ float moveZ = 0;
 float tick = 1.6;
 float radius = 9;
 float angle_animated_object = 0;
-/* ---------------------------------------- BEGIN:MESH CODE  ---------------------------------------- */
+bool perV = false;
 
-// normal per face
-void calculateNormalPerFace(Mesh* m) {
-	Vec3<float> v1, v2, v3, v4, v5;
-	for (int i = 0; i < m->face_index_vertex.size(); i += 3) {
-		v1 = m->dot_vertex[m->face_index_vertex[i]];
-		v2 = m->dot_vertex[m->face_index_vertex[i + 1]];
-		v3 = m->dot_vertex[m->face_index_vertex[i + 2]];
-		v4 = (v2 - v1);
-		v5 = (v3 - v1);
-		v4 = v4.cross(v5);
-		v4.normalize();
-		m->dot_normalPerFace.push_back(v4);
-		int pos = m->dot_normalPerFace.size() - 1;
-		// same normal for all vertex in this face
-		m->face_index_normalPerFace.push_back(pos);
-		m->face_index_normalPerFace.push_back(pos);
-		m->face_index_normalPerFace.push_back(pos);
-	}
-}
+float ylight = 100.0;
+float xlight = 100.0;
+GLfloat light_position[] = { xlight, ylight , 0, 0 };
+bool lightleft = false;
 
-// calculate normal per vertex
-void calculateNormalPerVertex(Mesh* m) {
-
-	m->dot_normalPerVertex.clear();
-	m->face_index_normalPerVertex.clear();
-	Vec3<float> suma; suma.x = 0; suma.y = 0; suma.z = 0;
-	//initialize
-	for (unsigned int val = 0; val < m->dot_vertex.size(); val++) {
-		m->dot_normalPerVertex.push_back(suma);
-	}
-	// calculate sum for vertex
-	for (long pos = 0; pos < m->face_index_vertex.size(); pos++) {
-		m->dot_normalPerVertex[m->face_index_vertex[pos]] += m->dot_normalPerFace[m->face_index_normalPerFace[pos]];
-	}
-	// normalize for vertex 
-	for (unsigned int val = 0; val < m->dot_normalPerVertex.size(); val++) {
-		m->dot_normalPerVertex[val] = m->dot_normalPerVertex[val].normalize();
-	}
-	//normalVertexIndex is the same that vertexIndex
-	for (unsigned int pos = 0; pos < m->face_index_vertex.size(); pos++) {
-		m->face_index_normalPerVertex.push_back(m->face_index_vertex[pos]);
-	}
-}
-
+//
+int PERVERTEX = 0;
+int PERFACE = 1;
+int LIGHT_TOP = 1;
+int LIGHT_MOVE = 0;
 
 // str to int
 int StrToInt(const string &str) {
@@ -151,6 +120,7 @@ Mesh* loadFile(const char* file) {
 			switch (current_line[1]) {
 			case 'n':
 				sscanf_s(current_line, "vn %f %f %f", &x, &y, &z);
+				m->dot_normalPerFace.push_back(Vec3f(x, y, z));
 				m->dot_normalPerVertex.push_back(Vec3f(x, y, z));
 				break;
 			case 't':
@@ -199,6 +169,7 @@ Mesh* loadFile(const char* file) {
 				for (int j = 0; j < 3; j++) {
 					m->face_index_vertex.push_back(vnt[j][0]);
 					if (vnt[j][1] != -1) m->face_index_texture.push_back(vnt[j][1]);
+					if (vnt[j][2] != -1) m->face_index_normalPerFace.push_back(vnt[j][2]);
 					if (vnt[j][2] != -1) m->face_index_normalPerVertex.push_back(vnt[j][2]);
 				}
 				memcpy(&vnt[1], &vnt[2], sizeof(int) * 3);
@@ -209,6 +180,7 @@ Mesh* loadFile(const char* file) {
 			break;
 		}
 	}
+
 	return m;
 }
 
@@ -222,7 +194,7 @@ Mesh* createDiamond() {
 	mesh->dot_vertex.push_back(Vec3f(100, 0, -100));
 	mesh->dot_vertex.push_back(Vec3f(0, 100, 0));
 	mesh->dot_vertex.push_back(Vec3f(0, -100, 0));
-	// Indexes
+	// Faces
 	mesh->face_index_vertex.push_back(0); mesh->face_index_vertex.push_back(2); mesh->face_index_vertex.push_back(1);
 	mesh->face_index_vertex.push_back(0); mesh->face_index_vertex.push_back(3); mesh->face_index_vertex.push_back(2);
 	mesh->face_index_vertex.push_back(3); mesh->face_index_vertex.push_back(2); mesh->face_index_vertex.push_back(4);
@@ -233,7 +205,53 @@ Mesh* createDiamond() {
 	mesh->face_index_vertex.push_back(0); mesh->face_index_vertex.push_back(5); mesh->face_index_vertex.push_back(3);
 	mesh->face_index_vertex.push_back(3); mesh->face_index_vertex.push_back(5); mesh->face_index_vertex.push_back(2);
 	mesh->face_index_vertex.push_back(2); mesh->face_index_vertex.push_back(5); mesh->face_index_vertex.push_back(1);
+
+	//Normals (Per Face)
 	return mesh;
+}
+
+// normal per face
+void calculateNormalPerFace(Mesh* m) {
+	Vec3<float> v1, v2, v3, v4, v5;
+	for (int i = 0; i < m->face_index_vertex.size(); i += 3) {
+		v1 = m->dot_vertex[m->face_index_vertex[i]];
+		v2 = m->dot_vertex[m->face_index_vertex[i + 1]];
+		v3 = m->dot_vertex[m->face_index_vertex[i + 2]];
+		v4 = (v2 - v1);
+		v5 = (v3 - v1);
+		v4 = v4.cross(v5);
+		v4.normalize();
+		m->dot_normalPerFace.push_back(v4);
+		int pos = m->dot_normalPerFace.size() - 1;
+		// same normal for all vertex in this face
+		m->face_index_normalPerFace.push_back(pos);
+		m->face_index_normalPerFace.push_back(pos);
+		m->face_index_normalPerFace.push_back(pos);
+	}
+}
+
+// calculate normal per vertex
+void calculateNormalPerVertex(Mesh* m) {
+	m->dot_normalPerVertex.clear();
+	m->face_index_normalPerVertex.clear();
+	Vec3<float> suma; suma.x = 0; suma.y = 0; suma.z = 0;
+	//initialize
+	for (unsigned int val = 0; val < m->dot_vertex.size(); val++) {
+		m->dot_normalPerVertex.push_back(suma);
+	}
+	// calculate sum for vertex
+	for (long pos = 0; pos < m->face_index_vertex.size(); pos++) {
+		m->dot_normalPerVertex[m->face_index_vertex[pos]] +=
+			m->dot_normalPerFace[m->face_index_normalPerFace[pos]];
+	}
+	// normalize for vertex 
+	for (unsigned int val = 0; val < m->dot_normalPerVertex.size(); val++) {
+		m->dot_normalPerVertex[val] = m->dot_normalPerVertex[val].normalize();
+	}
+	//normalVertexIndex is the same that vertexIndex
+	for (unsigned int pos = 0; pos < m->face_index_vertex.size(); pos++) {
+		m->face_index_normalPerVertex.push_back(m->face_index_vertex[pos]);
+	}
 }
 
 // creating a triangulated plane
@@ -258,36 +276,100 @@ Mesh* createPlane(int arena_width, int arena_depth, int arena_cell) {
 	return me;
 }
 
-
 // draw
 GLuint meshToDisplayList(Mesh* m, int id) {
 	GLuint listID = glGenLists(id);
 	glNewList(listID, GL_COMPILE);
 	glBegin(GL_TRIANGLES);
+
 	for (unsigned int i = 0; i < m->face_index_vertex.size(); i++) {
-		if (!m->dot_normalPerVertex.empty() && !m->face_index_normalPerVertex.empty()) {
+		if (PERVERTEX && (!m->dot_normalPerVertex.empty() && !m->face_index_normalPerVertex.empty())) {
 			glNormal3fv(&m->dot_normalPerVertex[m->face_index_normalPerVertex[i]].x);
+			//printf("PERVERTEX");
 		}
-		if (!m->dot_texture.empty() && !m->face_index_texture.empty())
+		else if (PERFACE && (!m->dot_normalPerFace.empty() && !m->face_index_normalPerFace.empty())) {
+			glNormal3fv(&m->dot_normalPerFace[m->face_index_normalPerFace[i]].x);
+			//printf("PERFACE");
+		}
+		if (!m->dot_texture.empty() && !m->face_index_texture.empty()) {
 			glTexCoord2fv(&m->dot_texture[m->face_index_texture[i]].x);
+		}
 		// color
 		Vec3f offset = (m->dot_vertex[m->face_index_vertex[i]]);
 		//
 		glColor3f(fabs(sin(offset.x)), fabs(cos(offset.y)), fabs(offset.z));
 		glVertex3fv(&m->dot_vertex[m->face_index_vertex[i]].x);
 	}
+
 	glEnd();
 	glEndList();
 	return listID;
 }
-/* ----------------------------------------- END:MESH CODE  ----------------------------------------- */
-// addLight
-void addLight() {
+
+// menuListener
+void menuListener(int option) {
+	switch (option) {
+	case 1:
+		PERFACE = 1; PERVERTEX = 0;
+		displayDiamond = meshToDisplayList(mesh1, 1);
+		displayPlane = meshToDisplayList(mesh2, 2);
+		displayMesh = meshToDisplayList(mesh3, 3);
+		break;
+	case 2:
+		PERFACE = 0; PERVERTEX = 1;
+		displayDiamond = meshToDisplayList(mesh1, 1);
+		displayPlane = meshToDisplayList(mesh2, 2);
+		displayMesh = meshToDisplayList(mesh3, 3);
+		break;
+	case 3:
+		LIGHT_TOP = 1; LIGHT_MOVE = 0; break;
+	case 4:
+		LIGHT_TOP = 0; LIGHT_MOVE = 1; break;
+	}
+	glutPostRedisplay();
+}
+
+// create menu
+void createMenus() {
+	//add entries to submenu Normals
+	int menuA = glutCreateMenu(menuListener);
+	glutAddMenuEntry("Per Face", 1);
+	glutAddMenuEntry("Per Vertex", 2);
+	//add entries to submenu Light
+	int menuB = glutCreateMenu(menuListener);
+	glutAddMenuEntry("Top", 3);
+	glutAddMenuEntry("Moving", 4);
+	// create main menu
+	int menu = glutCreateMenu(menuListener);
+	glutAddSubMenu("Normals", menuA);
+	glutAddSubMenu("Light", menuB);
+	// attach the menu to the right button
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+// init
+void init() {
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_DEPTH_TEST);
+	ratio = (double)width / (double)height;
+	// menu
+	createMenus();
+	// mesh
+	mesh1 = createDiamond();
+	mesh2 = createPlane(1000, 1000, 40);
+	mesh3 = loadFile("../../OBJ files/porsche.obj");
+	calculateNormalPerFace(mesh1);
+	calculateNormalPerFace(mesh2);
+	calculateNormalPerVertex(mesh1);
+	calculateNormalPerVertex(mesh2);
+	displayDiamond = meshToDisplayList(mesh1, 1);
+	displayPlane = meshToDisplayList(mesh2, 2);
+	displayMesh = meshToDisplayList(mesh3, 3);
+	// light
 	GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position[] = { 0.0, 100.0, 0.0, 0.0 };
-	// what kind of light source?
+	GLfloat light_position[] = { 250.0, 125.0, 250.0, 0.0 };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
@@ -295,25 +377,6 @@ void addLight() {
 	// enable
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
-}
-
-// init
-void init() {
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_DEPTH_TEST);
-	Mesh* mesh1 = createDiamond();
-	calculateNormalPerFace(mesh1);
-	calculateNormalPerVertex(mesh1);
-	displayDiamond = meshToDisplayList(mesh1, 1);
-	Mesh* mesh2 = createPlane(1000, 1000, 40);
-	calculateNormalPerFace(mesh2);
-	calculateNormalPerVertex(mesh2);
-	displayPlane = meshToDisplayList(mesh2, 2);
-	Mesh* mesh3 = loadFile("../../OBJ files/porsche.obj");
-	displayMesh = meshToDisplayList(mesh3, 3);
-	ratio = (double)width / (double)height;
-	// light
-	addLight();
 }
 
 // reshape
@@ -337,11 +400,11 @@ void motion(int x, int y) {
 		y_angle += (float(x - mouse_x) / width) *360.0;
 		x_angle += (float(y - mouse_y) / height)*360.0;
 	}
-	if (mouse_button == GLUT_RIGHT_BUTTON) {
-		scale += (y - mouse_y) / 100.0;
-		if (scale < 0.1) scale = 0.1;
-		if (scale > 7)	scale = 7;
-	}
+	//if (mouse_button == GLUT_RIGHT_BUTTON) {
+	//  scale += (y - mouse_y) / 100.0;
+	//  if (scale < 0.1) scale = 0.1;
+	//  if (scale > 7)	scale = 7;
+	//}
 	mouse_x = x;
 	mouse_y = y;
 	glutPostRedisplay();
@@ -368,6 +431,7 @@ void renderBitmapString(float x, float y, float z, const char *string) {
 // display
 void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	// projection
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -378,18 +442,15 @@ void display(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	// lookAt fijo
+	// lookAt
 	gluLookAt(0.0f, 40.0f, 320.0,
 		0.0f, 1.0f, -1.0f,
 		0.0f, 1.0f, 0.0f);
-
 	// camera
 	glScalef(scale, scale, scale);
 	glRotatef(x_angle, 1.0f, 0.0f, 0.0f);
 	glRotatef(y_angle, 0.0f, 1.0f, 0.0f);
 	glTranslatef(0.0f, 0.0f, 0.0f);
-
-
 	//plane
 	glPushMatrix();
 	glTranslatef(-500, 0, -500);
@@ -397,22 +458,37 @@ void display(void) {
 	glPopMatrix();
 	// diamond center
 	glPushMatrix();
-	//glScalef(80, 80, 80);
 	glCallList(displayDiamond);
 	glPopMatrix();
 	// diamond moving
 	glPushMatrix();
 	if (angle_animated_object <= -360) angle_animated_object = 0;
-	angle_animated_object -= 0.05;
+	angle_animated_object -= 0.03;
 	glRotatef(angle_animated_object, 0, 1, 0);
 	glTranslatef(200, 20, 0);
 	glCallList(displayMesh);
 	glPopMatrix();
 
+	// light
+	glPushMatrix();
+	if (LIGHT_TOP) {
+		GLfloat light_position[] = { 250.0, 125.0, 250.0, 0.0 };
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	}
+	else {
+		glRotatef(angle_animated_object, 0, 0, 1);
+		glTranslatef(500, 20, 0);
+		GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	}
+	glPopMatrix();
+
+	// end
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
+
 	// texto
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -423,13 +499,15 @@ void display(void) {
 	glLoadIdentity();
 	glColor3f(1.0, 1.0, 1.0);
 	renderBitmapString(0.0, height - 13.0f, 0.0f, "Use [Mouse Left Key] to rotate");
-	renderBitmapString(0.0, height - 26.0f, 0.0f, "Use [Mouse Right Key] to scale");
+	//renderBitmapString(0.0, height - 26.0f, 0.0f, "Use [Mouse Right Key] to scale");
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
+
 	glutSwapBuffers();
 	move();
+
 }
 
 // main
@@ -438,12 +516,14 @@ void main(int argc, char* argv[]) {
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(width, height);
-	glutCreateWindow("Mesh Data Structure");
+	glutCreateWindow("Light");
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutIdleFunc(display);
 	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
+
 	init();
+
 	glutMainLoop();
 }
