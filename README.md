@@ -6,26 +6,28 @@ See: http://javiergs.com/teaching/ser332
 <ol>
 <li>Course Presentation
 <li>Concepts
-<li>OpenGL: Introduction
-<li>OpenGL: Callback Functions
-<li>OpenGL: Vertex and Shading
-<li>OpenGL: Lab 1  
-<li>OpenGL: Transformations (ModelView)
-<li>OpenGL: Transformations (Viewport)
-<li>OepnGL: Lab 2
-<li>OpenGL: Display Lists and Menus
-<li>OpenGL: Transformations (Projection)
-<li>OpenGL: Lab 3
+<li>Introduction to OpenGL
+<li>Callback Functions
+<li>OVertex
+<li>Lab 01 (Drawing 2D)
+<li>Transformations (ModelView)
+<li>Transformations (Viewport)
+<li>Lab 02 (Transformations)
+<li>Display Lists and Menus
+<li>Transformations (Projection)
+<li>Lab 03 (Perspective)
 <li>Linear Algebra
-<li>OpenGL: Lab 4
+<li>Lab 04 (Camera)
     
-<li>OpenGL: Fonts, OBJ files, and Midterm Review
+<li>Fonts, OBJ files, and Midterm Review
 <li>Mesh Data Structure
-<li>Lab 5 (Load Data in a Mesh Data Structure)
-<li>Lab 6 (OBJ Files)
-<li>Light and Normals
+<li>Lab 05 (OBJ files)
+<li>Mesh Data Structure II
+<li>Lighting
+<li>Lab 06 (lighting)  
 <li>Materials
-<li>Lab 7 (light and materials)
+<li>Lab 07 (materials)      
+
 <li>Textures
 <li>Lab 8 (Textures)
 <li>Noise
