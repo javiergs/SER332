@@ -1,5 +1,5 @@
 /*
- * Lecture 22
+ * Lecture 23
  * http://javiergs.com/teaching/ser332
  *
  * Note: BMP and OBJ files are needed to run this program
