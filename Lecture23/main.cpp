@@ -61,7 +61,6 @@ GLfloat light_position[] = { xlight, ylight , 0, 0 };
 bool   lightleft = false;
 
 /* -------------------------------------- BEGIN::TEXTURES WITH BITMAPS-------------------------------- */
-GLuint textureArray[8];
 
 // Load a DIB or BMP file from disk.
 GLubyte* load_bmp_file(const char *filename, BITMAPINFO **info) {
@@ -111,40 +110,40 @@ GLubyte* load_bmp_file(const char *filename, BITMAPINFO **info) {
 }
 
 // Create texture from a DIB or BMP file
-void texture_from_file(GLuint textureArray[], const char * file, int n) {
+void texture_from_file(GLuint *textureArray, const char * file) {
 	BITMAPINFO *bitmapInfo; // Bitmap information
 	GLubyte    *bitmapBits; // Bitmap data
 	if (!file) {
 		cout << "texture file not found!" << endl;
 		return;
 	}
+	// load image
 	bitmapBits = load_bmp_file(file, &bitmapInfo);
-	glGenTextures(1, &textureArray[n]);
-	glBindTexture(GL_TEXTURE_2D, textureArray[n]);
+	// setup texture
+	glGenTextures(1, textureArray);
+	glBindTexture(GL_TEXTURE_2D, *textureArray);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // must set to 1 for compact data
-																				 // glTexImage2D Whith size and minification
 	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, bitmapInfo->bmiHeader.biWidth, bitmapInfo->bmiHeader.biHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, bitmapBits);
 }
 
 // Create texture from algorithm
-void texture_from_algorithm(GLuint textureArray[], int n) {
+void texture_from_algorithm(GLuint *textureArray) {
 	const int TexHeight = 128;
 	const int TexWidth = 128;
 	// create texture in memory
-	GLubyte textureImage[TexHeight][TexWidth][4];
+	GLubyte textureImage[TexHeight][TexWidth][3];
 	for (int i = 0; i < TexHeight; i++)
 		for (int j = 0; j < TexWidth; j++) {
 			textureImage[i][j][0] = 127 + i;	// red value from 0 to 255 
 			textureImage[i][j][1] = 0;				// green value from 0 to 255 
 			textureImage[i][j][2] = 127 + j;	// blue value from 0 to 255 
-			textureImage[i][j][3] = 1;				// alpha value from 0 to 255 
 		}
 	// setup texture
-	glGenTextures(1, &textureArray[n]);
-	glBindTexture(GL_TEXTURE_2D, textureArray[n]);
+	glGenTextures(1, textureArray);
+	glBindTexture(GL_TEXTURE_2D, *textureArray);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // must set to 1 for compact data
-																				 // glTexImage2D Whith size and minification
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, TexWidth, TexHeight, GL_BGRA_EXT, GL_UNSIGNED_BYTE, textureImage); // BGRA to include alpha
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, TexWidth, TexHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, textureImage);
+
 }
 
 /* ------------------------------------------- END::TEXTURES ----------------------------------------- */
@@ -424,14 +423,14 @@ Mesh *createPlane(int arena_width, int arena_depth, int arena_cell) {
 }
 
 // draw
-GLuint meshToDisplayList(Mesh* m, int id) {
+GLuint meshToDisplayList(int id, Mesh* m, GLuint texture) {
 	GLuint listID = glGenLists(id);
 	glNewList(listID, GL_COMPILE);
-	if (id != 3) {
-		glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glBindTexture(GL_TEXTURE_2D, textureArray[id - 1]);
-	}
+	
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < m->face_index_vertex.size(); i++) {
 		// PER VERTEX NORMALS
@@ -450,9 +449,9 @@ GLuint meshToDisplayList(Mesh* m, int id) {
 	}
 
 	glEnd();
-	if (id != 3) {
-		glDisable(GL_TEXTURE_2D);
-	}
+
+	glDisable(GL_TEXTURE_2D);
+
 	glEndList();
 	return listID;
 }
@@ -461,28 +460,31 @@ GLuint meshToDisplayList(Mesh* m, int id) {
 
 // init
 void init() {
+
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
 	ratio = (double)width / (double)height;
 	// mesh
 	mesh_cube = createCube();
 	mesh_floor = createPlane(1200, 1200, 300);
-	mesh_ball = loadFile("../../obj files/ball.obj");
+	mesh_ball = createCube();
 	calculateNormalPerFace(mesh_cube);
 	calculateNormalPerFace(mesh_floor);
 	calculateNormalPerFace(mesh_ball);
 	calculateNormalPerVertex(mesh_cube);
 	calculateNormalPerVertex(mesh_floor);
 	calculateNormalPerVertex(mesh_ball);
+	
 	// TEXTURES
+	GLuint texture_array[3];
+	texture_from_file(&texture_array[0], "../../bmp files/oldbox.bmp");
+	texture_from_file(&texture_array[1], "../../bmp files/brick.bmp");
+	texture_from_algorithm(&texture_array[2]);
 
-	texture_from_file(textureArray, "../../bmp files/oldbox.bmp", 0);
-	texture_from_file(textureArray, "../../bmp files/brick.bmp", 1);
-	texture_from_algorithm(textureArray, 2);
 	// DISPLAY LIST
-	display_cube = meshToDisplayList(mesh_cube, 1);
-	display_floor = meshToDisplayList(mesh_floor, 2);
-	display_ball = meshToDisplayList(mesh_ball, 3);
+	display_cube = meshToDisplayList(1, mesh_cube, texture_array[0]);
+	display_floor = meshToDisplayList(2, mesh_floor, texture_array[1]);
+	display_ball = meshToDisplayList(3, mesh_ball, texture_array[2]);
 	// LIGHT
 	GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -587,8 +589,8 @@ void display(void) {
 	if (angle_animated_object <= -360) angle_animated_object = 0;
 	angle_animated_object -= 0.03;
 	glRotatef(angle_animated_object, 0, 1, 0);
-	glTranslatef(200, 30, 0);
-	glScalef(30, 30, 30);
+	glTranslatef(200, 0, 0);
+	//glScalef(30, 30, 30);
 	glCallList(display_ball);
 	glPopMatrix();
 	// end
