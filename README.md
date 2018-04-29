@@ -6,9 +6,9 @@ See: http://javiergs.com/teaching/ser332
 <ol>
 <li>Course Presentation
 <li>Concepts
-<li>Introduction to OpenGL
+<li>OpenGL Overview
 <li>Callback Functions
-<li>OVertex
+<li>Vertex
 <li>Lab 01 (Drawing 2D)
 <li>Transformations (ModelView)
 <li>Transformations (Viewport)
@@ -17,8 +17,7 @@ See: http://javiergs.com/teaching/ser332
 <li>Transformations (Projection)
 <li>Lab 03 (Perspective)
 <li>Linear Algebra
-<li>Lab 04 (Camera)
-    
+<li>Lab 04 (Camera)    
 <li>Fonts, OBJ files, and Midterm Review
 <li>Mesh Data Structure
 <li>Lab 05 (OBJ files)
@@ -26,13 +25,9 @@ See: http://javiergs.com/teaching/ser332
 <li>Lighting
 <li>Lab 06 (lighting)  
 <li>Materials
-<li>Lab 07 (materials)      
-
+<li>Lab 07 (Materials)      
 <li>Textures
-<li>Lab 8 (Textures)
-<li>Noise
-<li>Lab 8 (Navigation)
-<li>Lab 9 (Noise)
+<li>Coding Review
 <li>Final Review
 </ol>
     
