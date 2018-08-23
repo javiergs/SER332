@@ -1,5 +1,5 @@
 
-* Example Materials
+* Example Textures
 
 <p align="center">
   <img src="ScreenShot2.png" width="480"/>
