@@ -1,7 +1,8 @@
 # SER332
-Code examples for SER332 course (Introduction to Graphics)
+Introduction to Graphics
+Arizona State University
 
-See: http://javiergs.com/teaching/ser332
+Code examples per lecture.
 
 <ol>
 <li>Course Presentation
