@@ -4,6 +4,8 @@ Arizona State University
 
 Code examples per lecture.
 
+SER332 is a beginner level course for students interested in learning foundations of graphics and basic principles of the game development pipeline. We do programming in C/C++ and use the OpenGL graphics library.
+
 <ol>
 <li>Course Presentation
 <li>Concepts
